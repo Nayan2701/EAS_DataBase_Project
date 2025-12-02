@@ -21,7 +21,7 @@ def create_connection(db_file, delete_db=False):
 
 def create_table(conn, create_table_sql, drop_table_name=None):
     
-    if drop_table_name: # You can optionally pass drop_table_name to drop the table. 
+    if drop_table_name: 
         try:
             c = conn.cursor()
             c.execute("""DROP TABLE IF EXISTS %s""" % (drop_table_name))
@@ -87,7 +87,7 @@ def step3_create_country_table(data_filename, normalized_database_filename):
     # Get foreign keys
     region_map = step2_create_region_to_regionid_dictionary(normalized_database_filename)
 
-    # 1. Create Table (Pay attention to the COMMAS at the end of lines!)
+    
     sql_create = """CREATE TABLE IF NOT EXISTS Country (
                         CountryID INTEGER NOT NULL PRIMARY KEY,
                         Country TEXT NOT NULL,
@@ -105,16 +105,13 @@ def step3_create_country_table(data_filename, normalized_database_filename):
         region_name = cols[4]
         countries.add((country_name, region_name))
 
-    # 3. Sort
     sorted_countries = sorted(list(countries))
-    
-    # 4. Prepare Insert Data
+
     data_to_insert = []
     for c_name, r_name in sorted_countries:
         r_id = region_map[r_name]
         data_to_insert.append((c_name, r_id))
 
-    # 5. Insert
     with conn:
         cur = conn.cursor()
         cur.executemany("INSERT INTO Country (Country, RegionID) VALUES (?, ?)", data_to_insert)
@@ -136,7 +133,6 @@ def step5_create_customer_table(data_filename, normalized_database_filename):
     conn = create_connection(normalized_database_filename)
     country_map = step4_create_country_to_countryid_dictionary(normalized_database_filename)
 
-    # 1. Create Table (Ensure commas are at the end of every column line)
     sql_create = """CREATE TABLE IF NOT EXISTS Customer (
                         CustomerID INTEGER NOT NULL PRIMARY KEY,
                         FirstName TEXT NOT NULL,
@@ -148,7 +144,6 @@ def step5_create_customer_table(data_filename, normalized_database_filename):
                     );"""
     create_table(conn, sql_create, drop_table_name='Customer')
 
-    # 2. Parse Data
     unique_customers = set()
     lines = get_data_lines(data_filename)
     for line in lines:
@@ -159,13 +154,10 @@ def step5_create_customer_table(data_filename, normalized_database_filename):
         country = cols[3]
         unique_customers.add((full_name, address, city, country))
 
-    # 3. Sort (Sorting by Full Name string as per standard requirements)
     sorted_customers = sorted(list(unique_customers), key=lambda x: x[0])
 
-    # 4. Prepare Insert Data
     data_to_insert = []
     for full_name, address, city, country in sorted_customers:
-        # Name splitting logic
         parts = full_name.split()
         first_name = parts[0]
         last_name = " ".join(parts[1:])
@@ -173,7 +165,6 @@ def step5_create_customer_table(data_filename, normalized_database_filename):
         country_id = country_map[country]
         data_to_insert.append((first_name, last_name, address, city, country_id))
 
-    # 5. Insert
     with conn:
         cur = conn.cursor()
         cur.executemany("""INSERT INTO Customer (FirstName, LastName, Address, City, CountryID) 
@@ -289,7 +280,6 @@ def step11_create_orderdetail_table(data_filename, normalized_database_filename)
     cust_map = step6_create_customer_to_customerid_dictionary(normalized_database_filename)
     prod_map = step10_create_product_to_productid_dictionary(normalized_database_filename)
 
-    # 1. Create Table (Added missing commas)
     sql_create = """CREATE TABLE IF NOT EXISTS OrderDetail (
                         OrderID INTEGER NOT NULL PRIMARY KEY,
                         CustomerID INTEGER NOT NULL,
@@ -309,15 +299,12 @@ def step11_create_orderdetail_table(data_filename, normalized_database_filename)
         full_name = cols[0]
         cust_id = cust_map[full_name]
 
-        # Extract list columns
         p_names = cols[5].split(';')
         qtys = cols[9].split(';')
         dates = cols[10].split(';')
 
         for p_name, qty, date_str in zip(p_names, qtys, dates):
             prod_id = prod_map[p_name]
-            
-            # 2. Fix Date Format (Corrected parenthesis placement)
             formatted_date = datetime.datetime.strptime(date_str, '%Y%m%d').strftime('%Y-%m-%d')
             
             data_to_insert.append((cust_id, prod_id, formatted_date, int(qty)))
@@ -424,8 +411,6 @@ def ex5(conn):
     return sql_statement
 
 def ex6(conn):
-    # Rank countries within region.
-    # FIX: Changed alias TotalRank -> CountryRegionalRank
     sql_statement = """
     SELECT 
         r.Region,
@@ -445,8 +430,6 @@ def ex6(conn):
 
 
 def ex8(conn):
-    # Sum customer sales by Quarter and Year.
-    # FIX: Added 'Q' || ... to format Quarter as "Q1", "Q2" etc.
     sql_statement = """
     SELECT 
         'Q' || CAST((strftime('%m', o.OrderDate) + 2) / 3 AS TEXT) as Quarter,
@@ -463,8 +446,6 @@ def ex8(conn):
 
 
 def ex10(conn):
-    # Rank monthly sales.
-    # FIX: Grouped by Month Name using CASE statement to match "December", "January" etc.
     sql_statement = """
     SELECT 
         CASE strftime('%m', o.OrderDate)
@@ -491,8 +472,6 @@ def ex10(conn):
     return sql_statement
 
 def ex11(conn):
-    # MaxDaysWithoutOrder
-    # FIX: Removed CAST(... AS INTEGER) to ensure we get "78.0" (float) as per CSV
     sql_statement = """
     WITH OrderedDates AS (
         SELECT DISTINCT 
@@ -523,14 +502,8 @@ def ex11(conn):
     """
     return sql_statement
 
-# src/mini_project2.py
-
-# src/mini_project2.py
-
-# ... (Previous code remains the same) ...
 
 def ex4(conn):
-    # Fixed for PostgreSQL: Quoted identifiers, lowercase table names, numeric casting
     sql_statement = """
     SELECT 
         "r"."Region",
@@ -546,7 +519,6 @@ def ex4(conn):
     return sql_statement
 
 def ex7(conn):
-    # Fixed for PostgreSQL: Quoted identifiers, numeric casting
     sql_statement = """
     WITH RankedCountries AS (
         SELECT 
@@ -569,7 +541,6 @@ def ex7(conn):
     return sql_statement
 
 def ex9(conn):
-    # PostgreSQL Compatible Query
     sql_statement = """
     WITH CustomerSales AS (
         SELECT 

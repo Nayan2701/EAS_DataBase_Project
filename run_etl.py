@@ -1,7 +1,7 @@
 # run_etl.py
 from mini_project2 import *
 
-DATA_FILE = '/Users/nayanpaliwal/Downloads/mini-projecthash2/tests/data.csv'  # Assuming your data file is named this
+DATA_FILE = '/Users/nayanpaliwal/Downloads/mini-projecthash2/tests/data.csv'  
 DB_FILE = '/Users/nayanpaliwal/Downloads/mini-projecthash2/normalized.db'
 
 def run_all_etl_steps():

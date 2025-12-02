@@ -12,7 +12,7 @@ from src.mini_project2 import ex4, ex7, ex9
 
 RENDER_DB_URL = os.environ.get("RENDER_DB_URL", "postgresql://eas_project_database_user:7c9eN3hXoz2FW0w7A9TDtyrdkYhqPCsx@dpg-d4m9mlpr0fns73a1l40g-a.oregon-postgres.render.com/eas_project_database")
 
-GEMINI_API_KEY = "AIzaSyAquheHuFl2C8W1iEYCLx3BTuQMRpGv5Tk"
+GEMINI_API_KEY = "AIzaSyAt3-ZGmYUB8iCrTI0h-eEK4inCZVF2aas"
 
 SQL_SCHEMA_PATH = "sql_schema.txt" 
 CORRECT_PASSWORD = "Nayan" 

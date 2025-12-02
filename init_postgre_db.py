@@ -1,8 +1,7 @@
-# init_postgres_db.py
 import psycopg2
 import pandas as pd
 import json
-import sqlite3 # Needed to dump data first
+import sqlite3 
 from sqlalchemy import create_engine
 from urllib.parse import urlparse
 from sqlalchemy import text
