@@ -1,0 +1,8 @@
+CREATE TABLE "region" ("RegionID" INTEGER PRIMARY KEY, "Region" TEXT NOT NULL);
+CREATE TABLE "country" ("CountryID" INTEGER PRIMARY KEY, "Country" TEXT NOT NULL, "RegionID" INTEGER REFERENCES "region" ("RegionID"));
+CREATE TABLE "customer" ("CustomerID" INTEGER PRIMARY KEY, "FirstName" TEXT NOT NULL, "LastName" TEXT NOT NULL, "Address" TEXT NOT NULL, "City" TEXT NOT NULL, "CountryID" INTEGER REFERENCES "country" ("CountryID"));
+CREATE TABLE "productcategory" ("ProductCategoryID" INTEGER PRIMARY KEY, "ProductCategory" TEXT NOT NULL, "ProductCategoryDescription" TEXT NOT NULL);
+CREATE TABLE "product" ("ProductID" INTEGER PRIMARY KEY, "ProductName" TEXT NOT NULL, "ProductUnitPrice" REAL NOT NULL, "ProductCategoryID" INTEGER REFERENCES "productcategory" ("ProductCategoryID"));
+CREATE TABLE "orderdetail" ("OrderID" INTEGER PRIMARY KEY, "CustomerID" INTEGER REFERENCES "customer" ("CustomerID"), "ProductID" INTEGER REFERENCES "product" ("ProductID"), "OrderDate" DATE NOT NULL, "QuantityOrdered" INTEGER NOT NULL);
+
+Note: Total order amount is calculated by ("ProductUnitPrice" * "QuantityOrdered").
